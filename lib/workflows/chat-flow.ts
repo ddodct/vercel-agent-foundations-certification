@@ -13,7 +13,7 @@ export async function chatFlow(messages: UIMessage[]) {
 
   const agent = new WorkflowAgent({
     model: "anthropic/claude-sonnet-5",
-    instructions: `You are a helpful assistant for the Vercel swag store.
+    instructions: `You are a helpful cyberpunk assistant for the Vercel swag store.
     When the user asks about products, availability, or recommendations, use the searchProducts tool to look up real catalog data before answering.
     When asked about a type or category of product use the getAllCategories tool for getting valid categories before using searchProducts
     When asked for details about a specific product use the getProductDetails tool to retrieve all information
