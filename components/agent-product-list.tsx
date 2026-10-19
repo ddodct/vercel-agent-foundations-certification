@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
 import type { SearchProductsToolInvocation } from "@/lib/agent";
+import { TriangleImage } from "./triangle-image";
 
 interface AgentProductListProps {
   invocation: SearchProductsToolInvocation;
@@ -49,17 +49,17 @@ export function AgentProductList({ invocation }: AgentProductListProps) {
               href={`/products/${product.slug}`}
               className="flex items-center gap-3 p-3 transition-colors hover:bg-secondary/50"
             >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
-                {product.image && (
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                  />
-                )}
-              </div>
+              {product.image ? (
+                <TriangleImage
+                  src={product.image}
+                  alt={product.name}
+                  seed={product.id}
+                  sizes="56px"
+                  className="h-14 w-14 shrink-0 rounded-md"
+                />
+              ) : (
+                <div className="h-14 w-14 shrink-0 rounded-md bg-black" />
+              )}
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm font-semibold leading-tight">
                   {product.name}

@@ -21,8 +21,22 @@ import {
   MessageContent,
   MessageResponse,
 } from "./ai-elements/message";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "./ai-elements/reasoning";
+import { Task, type TaskStatus } from "./ai-elements/task";
 import { useChat } from "@ai-sdk/react";
 import { WorkflowChatTransport } from "@ai-sdk/workflow/client";
+
+function taskStatus(state: string): TaskStatus {
+  if (state === "output-available") return "complete";
+  if (state === "input-streaming" || state === "input-available") {
+    return "running";
+  }
+  return "error";
+}
 
 const SUGGESTIONS = [
   "Show me low-stock items",
@@ -33,7 +47,7 @@ const SUGGESTIONS = [
 export function AdminAgentChat() {
   const [input, setInput] = useState("");
 
-  const { messages, error, sendMessage } = useChat({
+  const { messages, error, sendMessage, status } = useChat({
     // we need to point to a different API route because this is a different agent
     transport: new WorkflowChatTransport({ api: "/api/admin/chat" }),
   });
@@ -64,16 +78,29 @@ export function AdminAgentChat() {
                       </MessageContent>
                     </Message>
                   );
+                case "reasoning": {
+                  if (!p.text.trim()) return null;
+                  return (
+                    <Reasoning key={`${m.id}-${i}`}>
+                      <ReasoningTrigger />
+                      <ReasoningContent>
+                        <MessageResponse>{p.text}</MessageResponse>
+                      </ReasoningContent>
+                    </Reasoning>
+                  );
+                }
                 case "tool-bash": {
                   const input = p.input as { command?: string } | undefined;
                   const output = p.output as
                     | { stdout?: string; stderr?: string }
                     | undefined;
                   return (
-                    <div
+                    <Task
                       key={`${m.id}-${i}`}
-                      className="my-2 rounded-lg bg-neutral-900 font-mono text-sm overflow-hidden border border-neutral-800"
+                      title="Run bash analysis"
+                      status={taskStatus(p.state)}
                     >
+                      <div className="my-2 rounded-lg bg-neutral-900 font-mono text-sm overflow-hidden border border-neutral-800">
                       <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800/50 border-b border-neutral-800 text-neutral-400">
                         <svg
                           className="size-4"
@@ -119,7 +146,8 @@ export function AdminAgentChat() {
                           </div>
                         )}
                       </div>
-                    </div>
+                      </div>
+                    </Task>
                   );
                 }
                 default:
@@ -151,7 +179,10 @@ export function AdminAgentChat() {
           </PromptInputBody>
           <PromptInputFooter>
             <PromptInputTools />
-            <PromptInputSubmit status="ready" disabled={!input.trim()} />
+            <PromptInputSubmit
+              status={status}
+              disabled={status === "ready" && !input.trim()}
+            />
           </PromptInputFooter>
         </PromptInput>
       </div>

@@ -1,6 +1,6 @@
 import Link from "next/link"
-import Image from "next/image"
 import { formatPrice } from "@/lib/format"
+import { TriangleImage } from "@/components/triangle-image"
 import type { Product } from "@/lib/types"
 
 interface ProductCardProps {
@@ -15,15 +15,15 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
       href={`/products/${product.id}`}
       className="group block overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/20"
     >
-      <div className="relative aspect-square overflow-hidden bg-secondary">
+      <div className="relative aspect-square overflow-hidden bg-black">
         {image && (
-          <Image
+          <TriangleImage
             src={image}
             alt={product.name}
-            fill
+            seed={product.id}
             priority={priority}
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="aspect-auto h-full"
           />
         )}
       </div>

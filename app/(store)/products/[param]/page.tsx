@@ -1,10 +1,10 @@
-import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { ApiRequestError, getProductById, getProducts } from "@/lib/api"
 import { formatPrice } from "@/lib/format"
+import { TriangleImage } from "@/components/triangle-image"
 import { ProductPurchase } from "./product-purchase"
 import { RelatedProducts } from "./related-products"
 
@@ -72,15 +72,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </Link>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
-        <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-secondary">
+        <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-black">
           {image && (
-            <Image
+            <TriangleImage
               src={image}
               alt={product.name}
-              fill
+              seed={product.id}
               priority
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
+              className="aspect-auto h-full"
             />
           )}
         </div>

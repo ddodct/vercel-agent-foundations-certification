@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
 import type { ProductDetailsToolInvocation } from "@/lib/agent";
+import { TriangleImage } from "./triangle-image";
 
 interface AgentProductCardProps {
   invocation: ProductDetailsToolInvocation;
@@ -49,13 +49,13 @@ export function AgentProductCard({ invocation }: AgentProductCardProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
       {image && (
-        <div className="relative aspect-4/3 bg-secondary">
-          <Image
+        <div className="relative aspect-4/3 bg-black">
+          <TriangleImage
             src={image}
             alt={output.name}
-            fill
+            seed={output.id}
             sizes="(min-width: 768px) 480px, 100vw"
-            className="object-cover"
+            className="absolute inset-0 aspect-auto"
           />
         </div>
       )}

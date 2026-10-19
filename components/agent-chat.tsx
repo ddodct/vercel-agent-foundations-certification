@@ -10,6 +10,12 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/ai-elements/reasoning";
+import { Task, type TaskStatus } from "@/components/ai-elements/task";
+import {
   PromptInput,
   PromptInputBody,
   PromptInputFooter,
@@ -22,6 +28,14 @@ import type { ShoppingAgentUIMessage } from "@/lib/agent";
 import { AgentProductCard } from "./agent-product-card";
 import { AgentProductList } from "./agent-product-list";
 
+function taskStatus(state: string): TaskStatus {
+  if (state === "output-available") return "complete";
+  if (state === "input-streaming" || state === "input-available") {
+    return "running";
+  }
+  return "error";
+}
+
 export function AgentChat() {
   const [input, setInput] = useState("");
 
@@ -30,7 +44,7 @@ export function AgentChat() {
     return localStorage.getItem("active-workflow-run-id") ?? undefined;
   }, []);
 
-  const { messages, error, sendMessage } = useChat<ShoppingAgentUIMessage>({
+  const { messages, error, sendMessage, status } = useChat<ShoppingAgentUIMessage>({
     resume: Boolean(activeRunId),
     transport: new WorkflowChatTransport({
       api: "/api/chat",
@@ -70,13 +84,48 @@ export function AgentChat() {
                       </MessageContent>
                     </Message>
                   );
+                case "reasoning": {
+                  if (!p.text.trim()) return null;
+                  return (
+                    <Reasoning key={`${m.id}-${i}`}>
+                      <ReasoningTrigger />
+                      <ReasoningContent>
+                        <MessageResponse>{p.text}</MessageResponse>
+                      </ReasoningContent>
+                    </Reasoning>
+                  );
+                }
                 case "tool-searchProducts":
                   return (
-                    <AgentProductList key={`${m.id}-${i}`} invocation={p} />
+                    <>
+                      <Task
+                        key={`${m.id}-${i}-task`}
+                        title="Search products"
+                        status={taskStatus(p.state)}
+                      />
+                      {p.state === "output-available" && (
+                        <AgentProductList
+                          key={`${m.id}-${i}-result`}
+                          invocation={p}
+                        />
+                      )}
+                    </>
                   );
                 case "tool-getProductDetails":
                   return (
-                    <AgentProductCard key={`${m.id}-${i}`} invocation={p} />
+                    <>
+                      <Task
+                        key={`${m.id}-${i}-task`}
+                        title="Load product details"
+                        status={taskStatus(p.state)}
+                      />
+                      {p.state === "output-available" && (
+                        <AgentProductCard
+                          key={`${m.id}-${i}-result`}
+                          invocation={p}
+                        />
+                      )}
+                    </>
                   );
                 default:
                   return null;
@@ -98,7 +147,10 @@ export function AgentChat() {
           </PromptInputBody>
           <PromptInputFooter>
             <PromptInputTools />
-            <PromptInputSubmit status="ready" disabled={!input.trim()} />
+            <PromptInputSubmit
+              status={status}
+              disabled={status === "ready" && !input.trim()}
+            />
           </PromptInputFooter>
         </PromptInput>
       </div>

@@ -138,3 +138,91 @@
   transition: none !important;
   animation: none !important;
 }
+
+/* Product images use a smaller, centered brand triangle that opens on hover. */
+.triangle-image {
+  background: #000;
+  isolation: isolate;
+}
+
+.triangle-image__mask {
+  position: absolute;
+  inset: 12%;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  transform-origin: center;
+  transition:
+    clip-path 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.triangle-image__image {
+  transform-origin: center;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.triangle-image[data-orientation='right'] .triangle-image__mask {
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+}
+
+.triangle-image[data-orientation='down'] .triangle-image__mask {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+.triangle-image:hover .triangle-image__mask,
+.triangle-image:focus-within .triangle-image__mask {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  transform: scale(1.45) rotate(360deg);
+}
+
+.triangle-image:hover .triangle-image__image,
+.triangle-image:focus-within .triangle-image__image {
+  transform: rotate(-360deg);
+}
+
+.triangle-image[data-orientation='right']:hover .triangle-image__mask,
+.triangle-image[data-orientation='right']:focus-within .triangle-image__mask {
+  transform: scale(1.45) rotate(450deg);
+}
+
+.triangle-image[data-orientation='right']:hover .triangle-image__image,
+.triangle-image[data-orientation='right']:focus-within .triangle-image__image {
+  transform: rotate(-450deg);
+}
+
+.triangle-image[data-orientation='down']:hover .triangle-image__mask,
+.triangle-image[data-orientation='down']:focus-within .triangle-image__mask {
+  transform: scale(1.45) rotate(540deg);
+}
+
+.triangle-image[data-orientation='down']:hover .triangle-image__image,
+.triangle-image[data-orientation='down']:focus-within .triangle-image__image {
+  transform: rotate(-540deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .triangle-image__mask,
+  .triangle-image__image {
+    transition: none;
+  }
+}
+
+.task-interface[open] {
+  border-radius: var(--radius-lg);
+}
+
+.task-interface__summary::-webkit-details-marker {
+  display: none;
+}
+
+.task-interface__summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.task-interface__chevron {
+  transition: transform 150ms ease;
+}
+
+.task-interface[open] .task-interface__chevron {
+  transform: rotate(90deg);
+}
